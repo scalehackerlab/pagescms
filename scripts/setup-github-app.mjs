@@ -45,13 +45,11 @@ async function main() {
       "Pages CMS is an open source CMS for editing content in GitHub repositories.",
     public: false,
     default_permissions: {
-      administration: "write",
-      actions: "write",
       checks: "read",
       statuses: "read",
       contents: "write",
-      email_addresses: "read",
       metadata: "read",
+      emails: "read",
     },
     default_events: [
       "installation_target",
@@ -61,7 +59,6 @@ async function main() {
       "check_run",
       "check_suite",
       "status",
-      "workflow_run",
     ],
     request_oauth_on_install: false,
     setup_on_update: true,
@@ -69,7 +66,6 @@ async function main() {
     hook_attributes: {
       url: webhookUrl,
       active: true,
-      secret: webhookSecret,
     },
   };
 
@@ -102,7 +98,7 @@ async function main() {
     GITHUB_APP_CLIENT_ID: converted.client_id,
     GITHUB_APP_CLIENT_SECRET: converted.client_secret,
     GITHUB_APP_PRIVATE_KEY: wrapQuoted(escapeNewlines(converted.pem || "")),
-    GITHUB_APP_WEBHOOK_SECRET: webhookSecret,
+    GITHUB_APP_WEBHOOK_SECRET: converted.webhook_secret || webhookSecret,
   };
 
   if (envPath) {
@@ -111,6 +107,7 @@ async function main() {
 
   console.log("\nGitHub App created.");
   console.log(`- App: ${converted.name} (${converted.slug})`);
+  console.log(`- Webhook secret source: ${converted.webhook_secret ? "GitHub" : "LOCAL - set it manually in the app settings"}`);
   if (envPath) {
     console.log(`- Env file updated: ${envPath}`);
   } else {
